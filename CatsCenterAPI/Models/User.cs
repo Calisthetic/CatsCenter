@@ -15,9 +15,9 @@ public partial class User
 
     public string Token { get; set; } = null!;
 
-    public int UsageCount { get; set; }
+    public int? UsageCount { get; set; }
 
-    public DateTime LastUsage { get; set; }
+    public DateTime? LastUsage { get; set; }
 
     public virtual ICollection<BlockedUser> BlockedUsers { get; set; } = new List<BlockedUser>();
 
