@@ -19,13 +19,19 @@ public partial class CatsCenterDbContext : DbContext
 
     public virtual DbSet<BodyType> BodyTypes { get; set; }
 
+    public virtual DbSet<BodyTypesOfClassification> BodyTypesOfClassifications { get; set; }
+
     public virtual DbSet<Cat> Cats { get; set; }
 
     public virtual DbSet<Classification> Classifications { get; set; }
 
     public virtual DbSet<CoatPattern> CoatPatterns { get; set; }
 
+    public virtual DbSet<CoatPatternsOfClassification> CoatPatternsOfClassifications { get; set; }
+
     public virtual DbSet<CoatType> CoatTypes { get; set; }
+
+    public virtual DbSet<CoatTypesOfClassification> CoatTypesOfClassifications { get; set; }
 
     public virtual DbSet<Location> Locations { get; set; }
 
@@ -49,13 +55,26 @@ public partial class CatsCenterDbContext : DbContext
 
         modelBuilder.Entity<BodyType>(entity =>
         {
-            entity.Property(e => e.BodyTypeId).ValueGeneratedNever();
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(60);
+        });
+
+        modelBuilder.Entity<BodyTypesOfClassification>(entity =>
+        {
+            entity.HasKey(e => e.BodyTypeOfClassificationId);
+
+            entity.HasOne(d => d.BodyType).WithMany(p => p.BodyTypesOfClassifications)
+                .HasForeignKey(d => d.BodyTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BodyTypesOfClassifications_BodyTypes");
+
+            entity.HasOne(d => d.Classification).WithMany(p => p.BodyTypesOfClassifications)
+                .HasForeignKey(d => d.ClassificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BodyTypesOfClassifications_Classifications");
         });
 
         modelBuilder.Entity<Cat>(entity =>
         {
-            entity.Property(e => e.CatId).ValueGeneratedNever();
             entity.Property(e => e.FileName).HasMaxLength(100);
 
             entity.HasOne(d => d.AddedUser).WithMany(p => p.Cats)
@@ -69,45 +88,57 @@ public partial class CatsCenterDbContext : DbContext
 
         modelBuilder.Entity<Classification>(entity =>
         {
-            entity.Property(e => e.ClassificationId).ValueGeneratedNever();
-            entity.Property(e => e.Name).HasMaxLength(50);
-
-            entity.HasOne(d => d.BodyType).WithMany(p => p.Classifications)
-                .HasForeignKey(d => d.BodyTypeId)
-                .HasConstraintName("FK_Classifications_BodyTypes");
-
-            entity.HasOne(d => d.CoatPattern).WithMany(p => p.Classifications)
-                .HasForeignKey(d => d.CoatPatternId)
-                .HasConstraintName("FK_Classifications_CoatPatterns");
-
-            entity.HasOne(d => d.CoatType).WithMany(p => p.Classifications)
-                .HasForeignKey(d => d.CoatTypeId)
-                .HasConstraintName("FK_Classifications_CoatTypes");
+            entity.Property(e => e.Name).HasMaxLength(60);
         });
 
         modelBuilder.Entity<CoatPattern>(entity =>
         {
-            entity.Property(e => e.CoatPatternId).ValueGeneratedNever();
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(60);
+        });
+
+        modelBuilder.Entity<CoatPatternsOfClassification>(entity =>
+        {
+            entity.HasKey(e => e.CoatPatternOfClassificationId);
+
+            entity.HasOne(d => d.Classification).WithMany(p => p.CoatPatternsOfClassifications)
+                .HasForeignKey(d => d.ClassificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CoatPatternsOfClassifications_Classifications");
+
+            entity.HasOne(d => d.CoatPattern).WithMany(p => p.CoatPatternsOfClassifications)
+                .HasForeignKey(d => d.CoatPatternId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CoatPatternsOfClassifications_CoatPatterns");
         });
 
         modelBuilder.Entity<CoatType>(entity =>
         {
-            entity.Property(e => e.CoatTypeId).ValueGeneratedNever();
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(60);
+        });
+
+        modelBuilder.Entity<CoatTypesOfClassification>(entity =>
+        {
+            entity.HasKey(e => e.CoatTypeOfClassificationId);
+
+            entity.HasOne(d => d.Classification).WithMany(p => p.CoatTypesOfClassifications)
+                .HasForeignKey(d => d.ClassificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CoatTypesOfClassifications_Classifications");
+
+            entity.HasOne(d => d.CoatType).WithMany(p => p.CoatTypesOfClassifications)
+                .HasForeignKey(d => d.CoatTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CoatTypesOfClassifications_CoatTypes");
         });
 
         modelBuilder.Entity<Location>(entity =>
         {
-            entity.Property(e => e.LocationId).ValueGeneratedNever();
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(60);
         });
 
         modelBuilder.Entity<LocationsOfClassification>(entity =>
         {
             entity.HasKey(e => e.LocationOfClassificationId);
-
-            entity.Property(e => e.LocationOfClassificationId).ValueGeneratedNever();
 
             entity.HasOne(d => d.Classification).WithMany(p => p.LocationsOfClassifications)
                 .HasForeignKey(d => d.ClassificationId)
@@ -122,10 +153,10 @@ public partial class CatsCenterDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.Property(e => e.Email).HasMaxLength(50);
+            entity.Property(e => e.Email).HasMaxLength(20);
             entity.Property(e => e.LastUsage).HasColumnType("datetime");
-            entity.Property(e => e.Password).HasMaxLength(50);
-            entity.Property(e => e.Token).HasMaxLength(50);
+            entity.Property(e => e.Password).HasMaxLength(20);
+            entity.Property(e => e.Token).HasMaxLength(20);
         });
 
         OnModelCreatingPartial(modelBuilder);

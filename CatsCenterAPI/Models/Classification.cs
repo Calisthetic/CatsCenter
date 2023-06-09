@@ -17,13 +17,13 @@ public partial class Classification
 
     public string Name { get; set; } = null!;
 
-    public virtual BodyType? BodyType { get; set; }
+    public virtual ICollection<BodyTypesOfClassification> BodyTypesOfClassifications { get; set; } = new List<BodyTypesOfClassification>();
 
     public virtual ICollection<Cat> Cats { get; set; } = new List<Cat>();
 
-    public virtual CoatPattern? CoatPattern { get; set; }
+    public virtual ICollection<CoatPatternsOfClassification> CoatPatternsOfClassifications { get; set; } = new List<CoatPatternsOfClassification>();
 
-    public virtual CoatType? CoatType { get; set; }
+    public virtual ICollection<CoatTypesOfClassification> CoatTypesOfClassifications { get; set; } = new List<CoatTypesOfClassification>();
 
     public virtual ICollection<LocationsOfClassification> LocationsOfClassifications { get; set; } = new List<LocationsOfClassification>();
 }

@@ -9,5 +9,5 @@ public partial class CoatPattern
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Classification> Classifications { get; set; } = new List<Classification>();
+    public virtual ICollection<CoatPatternsOfClassification> CoatPatternsOfClassifications { get; set; } = new List<CoatPatternsOfClassification>();
 }

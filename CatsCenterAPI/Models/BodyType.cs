@@ -9,5 +9,5 @@ public partial class BodyType
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Classification> Classifications { get; set; } = new List<Classification>();
+    public virtual ICollection<BodyTypesOfClassification> BodyTypesOfClassifications { get; set; } = new List<BodyTypesOfClassification>();
 }
