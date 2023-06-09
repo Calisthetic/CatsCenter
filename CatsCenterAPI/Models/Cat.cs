@@ -10,6 +10,7 @@ public partial class Cat
     public int? ClassificationId { get; set; }
 
     public int? AddedUserId { get; set; }
+    public bool IsKitty { get; set; }
 
     public string FileName { get; set; } = null!;
 

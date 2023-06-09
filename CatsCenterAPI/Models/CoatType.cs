@@ -6,6 +6,7 @@ namespace CatsCenterAPI.Models;
 
 public partial class CoatType
 {
+    [JsonPropertyName("coat_type_id")]
     public int CoatTypeId { get; set; }
 
     public string Name { get; set; } = null!;

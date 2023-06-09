@@ -7,15 +7,9 @@ public partial class Classification
 {
     public int ClassificationId { get; set; }
 
-    public int? CoatTypeId { get; set; }
-
-    public int? CoatPatternId { get; set; }
-
-    public int? BodyTypeId { get; set; }
+    public string Name { get; set; } = null!;
 
     public bool IsBreed { get; set; }
-
-    public string Name { get; set; } = null!;
 
     public virtual ICollection<BodyTypesOfClassification> BodyTypesOfClassifications { get; set; } = new List<BodyTypesOfClassification>();
 

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CatsCenterAPI.Models;
 using Microsoft.CodeAnalysis;
+using CatsCenterAPI.Models.DataTransferObjects;
+using Microsoft.Extensions.Primitives;
 
 namespace CatsCenterAPI.Controllers
 {
@@ -23,13 +25,40 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Classifications
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Classification>>> GetClassifications()
+        public async Task<ActionResult<IEnumerable<ClassificationsSearch>>> GetClassifications(string body_type = "all", string coat_pattern = "all", string coat_type = "all", string location = "all")
         {
             if (_context.Classifications == null)
             {
                 return NotFound();
             }
-            return await _context.Classifications.Where(x => x.IsBreed == false).ToListAsync();
+            var result = await _context.Classifications.Where(x => x.IsBreed == true)
+                .Include(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
+                .Include(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
+                .Include(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
+                .Include(x => x.LocationsOfClassifications).ThenInclude(x => x.Location).ToListAsync();
+            //// Header value
+            //StringValues values;
+            //string result = "none";
+            //if (Request.Headers.TryGetValue("Authorization", out values))
+            //    result = values.FirstOrDefault();
+            //return Ok(result);
+            if (body_type.ToLower() != "all")
+            {
+                result = result.Where(x => x.BodyTypesOfClassifications.Any(str => str.BodyType.Name.ToLower().Contains(body_type.ToLower()) == true) == true).ToList();
+            }
+            if (coat_pattern.ToLower() != "all")
+            {
+                result = result.Where(x => x.CoatPatternsOfClassifications.Any(str => str.CoatPattern.Name.ToLower().Contains(coat_pattern.ToLower()) == true) == true).ToList();
+            }
+            if (coat_type.ToLower() != "all")
+            {
+                result = result.Where(x => x.CoatTypesOfClassifications.Any(str => str.CoatType.Name.ToLower().Contains(coat_type.ToLower()) == true) == true).ToList();
+            }
+            if (location.ToLower() != "all")
+            {
+                result = result.Where(x => x.LocationsOfClassifications.Any(str => str.Location.Name.ToLower().Contains(location.ToLower()) == true) == true).ToList();
+            }
+            return result.ConvertAll(x => new ClassificationsSearch(x));
         }
 
         [HttpGet("Felids")]
