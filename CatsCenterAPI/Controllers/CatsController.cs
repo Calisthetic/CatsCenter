@@ -23,18 +23,18 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Cats
         [HttpGet]
-        public async Task<ActionResult<CatWithImage>> GetCats()
+        public async Task<ActionResult<List<CatWithImage>>> GetCats(int count = 1)
         {
-          if (_context.Cats == null)
-          {
-              return NotFound();
-          }
+            if (_context.Cats == null)
+            {
+                return NotFound();
+            }
 
-            return _context.Cats.Skip(new Random().Next(_context.Cats.Count() - 1)).Take(1)
-                .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImage(x)).First();
+            return _context.Cats.Skip(new Random().Next(_context.Cats.Count() - 1 - count)).Take(count)
+                .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImage(x));
         }
 
-        [HttpGet("Count")]
+        [HttpGet("Total")]
         public async Task<ActionResult<int>> GetCatsCount()
         {
             if (_context.Cats == null)
@@ -49,10 +49,10 @@ namespace CatsCenterAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Cat>> GetCat(int id)
         {
-          if (_context.Cats == null)
-          {
-              return NotFound();
-          }
+            if (_context.Cats == null)
+            {
+                return NotFound();
+            }
             var cat = await _context.Cats.FindAsync(id);
 
             if (cat == null)
@@ -68,6 +68,17 @@ namespace CatsCenterAPI.Controllers
         {
             try
             {
+
+                if (catImage == null) 
+                    return BadRequest("No data");
+                if (catImage.File.Count() < 1)
+                    return BadRequest("No files sended");
+                if (catImage.IsKitty == null)
+                    return BadRequest("Is it Kitty?");
+                if (_context.Users == null)
+                    return BadRequest("DataBase error");
+
+
                 string path = @"C:\cat_images";
 
                 if (catImage.ClassificationId != null)
@@ -86,24 +97,26 @@ namespace CatsCenterAPI.Controllers
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
 
-                if (catImage.File.Count() < 1)
-                    return BadRequest("No files sended");
-
                 int filesSended = 0;
                 foreach (var file in catImage.File)
                 {
                     if (file.ContentType.StartsWith("image/"))
                     {
+                        string fileType = file.ContentType.Contains("webp") ? "webp" :
+                            file.ContentType.Contains("gif") ? "gif" : "jpg";
+
                         var cat = new Cat();
                         cat.Approved = false;
                         cat.AddedUserId = 1; // change after adding token
                         cat.ClassificationId = catImage.ClassificationId;
+                        cat.FileType = fileType;
                         cat.IsKitty = (bool)(catImage.IsKitty == null ? false : catImage.IsKitty);
+                        //cat.AddedUser = await _context.Users.FindAsync(1);
 
                         _context.Cats.Add(cat);
                         await _context.SaveChangesAsync();
 
-                        string filepath = Path.Combine(path, cat.CatId + ".jpg");
+                        string filepath = Path.Combine(path, cat.CatId + "." + fileType);
                         using (Stream stream = new FileStream(filepath, FileMode.Create))
                         {
                             file.CopyTo(stream);
@@ -117,10 +130,23 @@ namespace CatsCenterAPI.Controllers
 
                 return Ok(catImage);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message.ToString());
             }
+            //catch (DbEntityValidationException er)
+            //{
+            //    foreach (var eve in er.EntityValidationErrors)
+            //    {
+            //        return Ok("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:" +
+            //            eve.Entry.Entity.GetType().Name + eve.Entry.State);
+            //        //foreach (var ve in eve.ValidationErrors)
+            //        //{
+            //        //    MessageBox.Show("- Property: \"{0}\", Error: \"{1}\"" +
+            //        //        ve.PropertyName + ve.ErrorMessage);
+            //        //}
+            //    }
+            //}
         }
 
         // DELETE: api/Cats/5

@@ -81,11 +81,13 @@ public partial class CatsCenterDbContext : DbContext
         {
             entity.HasOne(d => d.AddedUser).WithMany(p => p.Cats)
                 .HasForeignKey(d => d.AddedUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Cats_Users");
 
             entity.HasOne(d => d.Classification).WithMany(p => p.Cats)
                 .HasForeignKey(d => d.ClassificationId)
                 .HasConstraintName("FK_Cats_Classifications");
+            entity.Property(e => e.FileType).HasMaxLength(20);
         });
 
         modelBuilder.Entity<CategoriesOfCat>(entity =>

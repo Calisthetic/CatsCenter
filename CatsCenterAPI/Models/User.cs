@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace CatsCenterAPI.Models;
 
@@ -19,7 +20,9 @@ public partial class User
 
     public DateTime? LastUsage { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<BlockedUser> BlockedUsers { get; set; } = new List<BlockedUser>();
 
+    [JsonIgnore]
     public virtual ICollection<Cat> Cats { get; set; } = new List<Cat>();
 }
