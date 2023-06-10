@@ -49,29 +49,37 @@ namespace CatsCenterAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Cat>> GetCat(int id)
         {
-            if (_context.Cats == null)
+            try
             {
-                return NotFound();
-            }
+                if (_context.Cats == null)
+                {
+                    return NotFound();
+                }
 
-            var cat = await _context.Cats.Where(x => x.CatId == id).Include(x => x.Classification).FirstAsync();
-            if (cat == null || cat.Approved == true)
+                var cat = await _context.Cats.Where(x => x.CatId == id).Include(x => x.Classification).FirstOrDefaultAsync();
+                if (cat == null)
+                    return NotFound("There's no image in database");
+                if (cat.Approved == true)
+                    return NotFound("Picture not available now...");
+
+                string classificationFolder = "NoClassification";
+                if (cat.Classification != null)
+                    classificationFolder = cat.Classification.Name;
+
+                string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+                string path = @"C:\cat_images\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+                if (System.IO.File.Exists(path))
+                {
+                    byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);
+                    return File(bytes, cat.FileType);
+                }
+
+                return NotFound("There's no image in collection");
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message.ToString());
             }
-
-            string classificationFolder = "NoClassification";
-            if (cat.Classification != null)
-                classificationFolder = cat.Classification.Name;
-
-            string path = @"C:\cat_images\" + classificationFolder + "\\" + cat.CatId + "." + cat.FileType[6..];
-            if (System.IO.File.Exists(path))
-            {
-                byte[] bytes = System.IO.File.ReadAllBytes(path);
-                return File(bytes, cat.FileType);
-            }
-
-            return NotFound();
         }
 
         [HttpPost]
@@ -119,7 +127,7 @@ namespace CatsCenterAPI.Controllers
                             Approved = false,
                             AddedUserId = 1, // change after adding token
                             ClassificationId = catImage.ClassificationId,
-                            FileType = "image/" + fileType,
+                            FileType = file.ContentType,
                             IsKitty = (bool)(catImage.IsKitty == null ? false : catImage.IsKitty)
                         };
 

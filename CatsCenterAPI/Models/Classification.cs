@@ -6,10 +6,12 @@ namespace CatsCenterAPI.Models;
 
 public partial class Classification
 {
+    [JsonPropertyName("classification_id")]
     public int ClassificationId { get; set; }
 
     public string Name { get; set; } = null!;
 
+    [JsonIgnore]
     public bool IsBreed { get; set; }
 
     [JsonIgnore]

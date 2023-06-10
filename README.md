@@ -12,3 +12,5 @@ Connection string to localhost
 
 - [Cat breeds](https://en.wikipedia.org/wiki/List_of_cat_breeds)
 - [Cat classifications](https://en.wikipedia.org/wiki/Felidae)
+- [Felidae](https://en.wikipedia.org/wiki/Felidae)
+- [Image types](https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types)
