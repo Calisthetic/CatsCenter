@@ -79,7 +79,6 @@ namespace CatsCenterAPI.Controllers
         {
             try
             {
-
                 if (catImage == null) 
                     return BadRequest("No data");
                 if (catImage.File.Count() < 1)
@@ -145,19 +144,6 @@ namespace CatsCenterAPI.Controllers
             {
                 return BadRequest(ex.Message.ToString());
             }
-            //catch (DbEntityValidationException er)
-            //{
-            //    foreach (var eve in er.EntityValidationErrors)
-            //    {
-            //        return Ok("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:" +
-            //            eve.Entry.Entity.GetType().Name + eve.Entry.State);
-            //        //foreach (var ve in eve.ValidationErrors)
-            //        //{
-            //        //    MessageBox.Show("- Property: \"{0}\", Error: \"{1}\"" +
-            //        //        ve.PropertyName + ve.ErrorMessage);
-            //        //}
-            //    }
-            //}
         }
 
         // DELETE: api/Cats/5
