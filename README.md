@@ -10,4 +10,5 @@ Connection string to localhost
 
 ## Links
 
-[Cat breeds](https://en.wikipedia.org/wiki/List_of_cat_breeds)
+- [Cat breeds](https://en.wikipedia.org/wiki/List_of_cat_breeds)
+- [Cat classifications](https://en.wikipedia.org/wiki/Felidae)

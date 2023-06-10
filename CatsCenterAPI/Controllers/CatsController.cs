@@ -23,13 +23,26 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Cats
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cat>>> GetCats()
+        public async Task<ActionResult<CatWithImage>> GetCats()
         {
           if (_context.Cats == null)
           {
               return NotFound();
           }
-            return await _context.Cats.ToListAsync();
+
+            return _context.Cats.Skip(new Random().Next(_context.Cats.Count() - 1)).Take(1)
+                .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImage(x)).First();
+        }
+
+        [HttpGet("Count")]
+        public async Task<ActionResult<int>> GetCatsCount()
+        {
+            if (_context.Cats == null)
+            {
+                return NotFound();
+            }
+
+            return await _context.Cats.CountAsync();
         }
 
         // GET: api/Cats/5
