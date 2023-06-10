@@ -53,14 +53,25 @@ namespace CatsCenterAPI.Controllers
             {
                 return NotFound();
             }
-            var cat = await _context.Cats.FindAsync(id);
 
-            if (cat == null)
+            var cat = await _context.Cats.Where(x => x.CatId == id).Include(x => x.Classification).FirstAsync();
+            if (cat == null || cat.Approved == true)
             {
                 return NotFound();
             }
 
-            return cat;
+            string classificationFolder = "NoClassification";
+            if (cat.Classification != null)
+                classificationFolder = cat.Classification.Name;
+
+            string path = @"C:\cat_images\" + classificationFolder + "\\" + cat.CatId + "." + cat.FileType[6..];
+            if (System.IO.File.Exists(path))
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+                return File(bytes, cat.FileType);
+            }
+
+            return NotFound();
         }
 
         [HttpPost]
@@ -102,16 +113,16 @@ namespace CatsCenterAPI.Controllers
                 {
                     if (file.ContentType.StartsWith("image/"))
                     {
-                        string fileType = file.ContentType.Contains("webp") ? "webp" :
-                            file.ContentType.Contains("gif") ? "gif" : "jpg";
+                        string fileType = file.ContentType.Contains("svg") ? "svg" : file.ContentType[6..];
 
-                        var cat = new Cat();
-                        cat.Approved = false;
-                        cat.AddedUserId = 1; // change after adding token
-                        cat.ClassificationId = catImage.ClassificationId;
-                        cat.FileType = fileType;
-                        cat.IsKitty = (bool)(catImage.IsKitty == null ? false : catImage.IsKitty);
-                        //cat.AddedUser = await _context.Users.FindAsync(1);
+                        var cat = new Cat
+                        {
+                            Approved = false,
+                            AddedUserId = 1, // change after adding token
+                            ClassificationId = catImage.ClassificationId,
+                            FileType = "image/" + fileType,
+                            IsKitty = (bool)(catImage.IsKitty == null ? false : catImage.IsKitty)
+                        };
 
                         _context.Cats.Add(cat);
                         await _context.SaveChangesAsync();
