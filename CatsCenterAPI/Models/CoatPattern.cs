@@ -12,5 +12,8 @@ public partial class CoatPattern
     public string Name { get; set; } = null!;
 
     [JsonIgnore]
+    public bool? IsExtra { get; set; }
+
+    [JsonIgnore]
     public virtual ICollection<CoatPatternsOfClassification> CoatPatternsOfClassifications { get; set; } = new List<CoatPatternsOfClassification>();
 }

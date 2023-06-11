@@ -106,7 +106,7 @@ namespace CatsCenterAPI.Controllers
             {
                 return NotFound();
             }
-            return await _context.CoatPatterns.ToListAsync();
+            return await _context.CoatPatterns.Where(x => x.IsExtra == false).ToListAsync();
         }
 
         [HttpGet("BodyTypes")]
@@ -129,103 +129,15 @@ namespace CatsCenterAPI.Controllers
             return await _context.Locations.ToListAsync();
         }
 
-        //// GET: api/Classifications/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Classification>> GetClassification(int id)
-        //{
-        //  if (_context.Classifications == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    var classification = await _context.Classifications.FindAsync(id);
-
-        //    if (classification == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return classification;
-        //}
-
-        //// PUT: api/Classifications/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutClassification(int id, Classification classification)
-        //{
-        //    if (id != classification.ClassificationId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(classification).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!ClassificationExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
-        //// POST: api/Classifications
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Classification>> PostClassification(Classification classification)
-        //{
-        //  if (_context.Classifications == null)
-        //  {
-        //      return Problem("Entity set 'CatsCenterDbContext.Classifications'  is null.");
-        //  }
-        //    _context.Classifications.Add(classification);
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        if (ClassificationExists(classification.ClassificationId))
-        //        {
-        //            return Conflict();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return CreatedAtAction("GetClassification", new { id = classification.ClassificationId }, classification);
-        //}
-
-        //// DELETE: api/Classifications/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteClassification(int id)
-        //{
-        //    if (_context.Classifications == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var classification = await _context.Classifications.FindAsync(id);
-        //    if (classification == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.Classifications.Remove(classification);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
+        [HttpGet("Classifications")]
+        public async Task<ActionResult<IEnumerable<Models.Classification>>> GetClassifications()
+        {
+            if (_context.Locations == null)
+            {
+                return NotFound();
+            }
+            return await _context.Classifications.ToListAsync();
+        }
 
         private bool ClassificationExists(int id)
         {
