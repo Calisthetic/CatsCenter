@@ -130,13 +130,13 @@ namespace CatsCenterAPI.Controllers
         }
 
         [HttpGet("Classifications")]
-        public async Task<ActionResult<IEnumerable<Models.Classification>>> GetClassifications()
+        public async Task<ActionResult<IEnumerable<Models.Category>>> GetClassifications()
         {
-            if (_context.Locations == null)
+            if (_context.Categories == null)
             {
                 return NotFound();
             }
-            return await _context.Classifications.ToListAsync();
+            return await _context.Categories.ToListAsync();
         }
 
         private bool ClassificationExists(int id)
