@@ -57,7 +57,7 @@ namespace CatsCenterAPI.Controllers
                     return NotFound();
                 }
 
-                var cat = await _context.Cats.Where(x => x.CatId == id).Include(x => x.Classification).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.CatId == id).FirstOrDefaultAsync();
                 if (cat == null)
                     return NotFound("There's no image in database");
                 if (cat.Approved == false)
@@ -197,7 +197,16 @@ namespace CatsCenterAPI.Controllers
             _context.Cats.Remove(cat);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            string classificationFolder = "NoClassification";
+            if (cat.Classification != null)
+                classificationFolder = cat.Classification.Name;
+
+            string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+            string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+
+            return Ok("Successfully deleted");
         }
 
         private bool CatExists(int id)
