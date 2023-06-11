@@ -30,7 +30,7 @@ namespace CatsCenterAPI.Controllers
                 return NotFound();
             }
 
-            return _context.Cats.Skip(new Random().Next(_context.Cats.Count() - 1 - count)).Take(count)
+            return _context.Cats.Where(x => x.Approved == false && x.Classification.IsBreed == true).OrderBy(x => Guid.NewGuid()).Take(count)
                 .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImage(x));
         }
 

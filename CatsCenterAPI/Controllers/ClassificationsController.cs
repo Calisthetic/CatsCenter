@@ -25,36 +25,42 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Classifications
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassificationsSearch>>> GetClassifications(string body_type = "all", string coat_pattern = "all", string coat_type = "all", string location = "all")
+        public async Task<ActionResult<IEnumerable<ClassificationsSearch>>> GetClassifications(string find = "", string body_type = "", string coat_pattern = "", string coat_type = "", string location = "")
         {
-            if (_context.Classifications == null)
-            {
-                return NotFound();
-            }
-            var result = await _context.Classifications.Where(x => x.IsBreed == true)
-                .Include(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
-                .Include(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
-                .Include(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
-                .Include(x => x.LocationsOfClassifications).ThenInclude(x => x.Location).ToListAsync();
             //// Header value
             //StringValues values;
             //string result = "none";
             //if (Request.Headers.TryGetValue("Authorization", out values))
             //    result = values.FirstOrDefault();
             //return Ok(result);
-            if (body_type.ToLower() != "all")
+
+            if (_context.Classifications == null)
+            {
+                return NotFound();
+            }
+            var result = await _context.Classifications
+                .Include(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
+                .Include(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
+                .Include(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
+                .Include(x => x.LocationsOfClassifications).ThenInclude(x => x.Location).ToListAsync();
+
+            if (find.ToLower() != "")
+            {
+                result = result.Where(x => x.Name.ToLower().Contains(find) == true).ToList();
+            }
+            if (body_type.ToLower() != "")
             {
                 result = result.Where(x => x.BodyTypesOfClassifications.Any(str => str.BodyType.Name.ToLower().Contains(body_type.ToLower()) == true) == true).ToList();
             }
-            if (coat_pattern.ToLower() != "all")
+            if (coat_pattern.ToLower() != "")
             {
                 result = result.Where(x => x.CoatPatternsOfClassifications.Any(str => str.CoatPattern.Name.ToLower().Contains(coat_pattern.ToLower()) == true) == true).ToList();
             }
-            if (coat_type.ToLower() != "all")
+            if (coat_type.ToLower() != "")
             {
                 result = result.Where(x => x.CoatTypesOfClassifications.Any(str => str.CoatType.Name.ToLower().Contains(coat_type.ToLower()) == true) == true).ToList();
             }
-            if (location.ToLower() != "all")
+            if (location.ToLower() != "")
             {
                 result = result.Where(x => x.LocationsOfClassifications.Any(str => str.Location.Name.ToLower().Contains(location.ToLower()) == true) == true).ToList();
             }
