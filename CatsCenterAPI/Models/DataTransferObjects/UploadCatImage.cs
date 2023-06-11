@@ -6,6 +6,8 @@
 
         public int? ClassificationId { get; set; }
 
+        public int[]? CategoryId { get; set; }
+
         public bool? IsKitty { get; set; }
     }
 }

@@ -67,7 +67,7 @@ namespace CatsCenterAPI.Controllers
                 if (cat.Classification != null)
                     classificationFolder = cat.Classification.Name;
 
-                string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+                string fileType = cat.FileType[6..];
                 string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
@@ -123,9 +123,9 @@ namespace CatsCenterAPI.Controllers
 
                 foreach (var file in catImage.File)
                 {
-                    if (file.ContentType.StartsWith("image/"))
+                    if (file.ContentType.StartsWith("image/") && !file.ContentType.Contains("svg"))
                     {
-                        string fileType = file.ContentType.Contains("svg") ? "svg" : file.ContentType[6..];
+                        string fileType = file.ContentType[6..];
 
                         // Add new value to database or change old
                         var cat = new Cat
@@ -201,7 +201,7 @@ namespace CatsCenterAPI.Controllers
             if (cat.Classification != null)
                 classificationFolder = cat.Classification.Name;
 
-            string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+            string fileType = cat.FileType[6..];
             string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
             if (System.IO.File.Exists(path))
                 System.IO.File.Delete(path);

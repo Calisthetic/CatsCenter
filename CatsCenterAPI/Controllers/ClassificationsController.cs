@@ -67,76 +67,53 @@ namespace CatsCenterAPI.Controllers
             return result.ConvertAll(x => new ClassificationsSearch(x));
         }
 
-        [HttpGet("Felids")]
-        public async Task<ActionResult<IEnumerable<Classification>>> GetFelidsClassifications()
+        [HttpGet("{section}")]
+        public async Task<ActionResult> GetFelidsClassifications(string section)
         {
-            if (_context.Classifications == null)
-            {
-                return NotFound();
-            }
-            return await _context.Classifications.Where(x => x.IsBreed == false).ToListAsync();
-        }
 
-        [HttpGet("Breeds")]
-        public async Task<ActionResult<IEnumerable<Classification>>> GetBreedsClassifications()
-        {
-            if (_context.Classifications == null)
+            switch (section.ToLower())
             {
-                return NotFound();
+                case "fl":
+                case "felids":
+                    if (_context.Classifications == null)
+                        return NotFound();
+                    return Ok(await _context.Classifications.Where(x => x.IsBreed == false).ToListAsync());
+                case "br":
+                case "breeds":
+                    if (_context.Classifications == null)
+                        return NotFound();
+                    return Ok(await _context.Classifications.Where(x => x.IsBreed == true).ToListAsync());
+                case "ct":
+                case "coattypes":
+                case "coat_types":
+                    if (_context.CoatTypes == null)
+                        return NotFound();
+                    return Ok(await _context.CoatTypes.ToListAsync());
+                case "cp":
+                case "coatpatterns":
+                case "coat_patterns":
+                    if (_context.CoatPatterns == null)
+                        return NotFound();
+                    return Ok(await _context.CoatPatterns.Where(x => x.IsExtra == false).ToListAsync());
+                case "bt":
+                case "bodytypes":
+                case "body_types":
+                    if (_context.BodyTypes == null)
+                        return NotFound();
+                    return Ok(await _context.BodyTypes.ToListAsync());
+                case "loc":
+                case "locations":
+                    if (_context.Locations == null)
+                        return NotFound();
+                    return Ok(await _context.Locations.ToListAsync());
+                case "cl":
+                case "classifications":
+                    if (_context.Classifications == null)
+                        return NotFound();
+                    return Ok(await _context.Classifications.Where(x => x.IsBreed == false).ToListAsync());
+                default:
+                    return BadRequest("Wrong {section}");
             }
-            return await _context.Classifications.Where(x => x.IsBreed == true).ToListAsync();
-        }
-
-        // Other classifications
-
-        [HttpGet("CoatTypes")]
-        public async Task<ActionResult<IEnumerable<CoatType>>> GetCoatTypes()
-        {
-            if (_context.CoatTypes == null)
-            {
-                return NotFound();
-            }
-            return await _context.CoatTypes.ToListAsync();
-        }
-
-        [HttpGet("CoatPatterns")]
-        public async Task<ActionResult<IEnumerable<CoatPattern>>> GetCoatPatterns()
-        {
-            if (_context.CoatTypes == null)
-            {
-                return NotFound();
-            }
-            return await _context.CoatPatterns.Where(x => x.IsExtra == false).ToListAsync();
-        }
-
-        [HttpGet("BodyTypes")]
-        public async Task<ActionResult<IEnumerable<BodyType>>> GetBodyTypes()
-        {
-            if (_context.BodyTypes == null)
-            {
-                return NotFound();
-            }
-            return await _context.BodyTypes.ToListAsync();
-        }
-
-        [HttpGet("Locations")]
-        public async Task<ActionResult<IEnumerable<Models.Location>>> GetLocations()
-        {
-            if (_context.Locations == null)
-            {
-                return NotFound();
-            }
-            return await _context.Locations.ToListAsync();
-        }
-
-        [HttpGet("Classifications")]
-        public async Task<ActionResult<IEnumerable<Models.Category>>> GetClassifications()
-        {
-            if (_context.Categories == null)
-            {
-                return NotFound();
-            }
-            return await _context.Categories.ToListAsync();
         }
 
         private bool ClassificationExists(int id)

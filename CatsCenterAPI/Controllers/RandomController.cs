@@ -31,7 +31,7 @@ namespace CatsCenterAPI.Controllers
                 if (cat.Classification != null)
                     classificationFolder = cat.Classification.Name;
 
-                string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+                string fileType = cat.FileType[6..];
                 string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
@@ -61,7 +61,7 @@ namespace CatsCenterAPI.Controllers
                 if (cat.Classification != null)
                     classificationFolder = cat.Classification.Name;
 
-                string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+                string fileType = cat.FileType[6..];
                 string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
@@ -91,7 +91,7 @@ namespace CatsCenterAPI.Controllers
                 if (cat.Classification != null)
                     classificationFolder = cat.Classification.Name;
 
-                string fileType = cat.FileType.Contains("svg") ? "svg" : cat.FileType[6..];
+                string fileType = cat.FileType[6..];
                 string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {

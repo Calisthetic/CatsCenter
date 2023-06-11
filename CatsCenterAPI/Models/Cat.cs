@@ -11,13 +11,14 @@ public partial class Cat
     public int? ClassificationId { get; set; }
 
     public int AddedUserId { get; set; }
+
     public string FileType { get; set; } = null!;
 
     public bool IsKitty { get; set; }
 
     public bool? Approved { get; set; }
 
-    public virtual User? AddedUser { get; set; }// = new User();
+    public virtual User? AddedUser { get; set; }
     [JsonIgnore]
     public virtual ICollection<CategoriesOfCat> CategoriesOfCats { get; set; } = new List<CategoriesOfCat>();
 
