@@ -26,31 +26,32 @@ namespace ConsoleScripts.Scripts
                     if (!File.Exists(filePath))
                         return;
 
+                    string parentFolder = path[(path.LastIndexOf('\\') + 1)..];
+                    Classification? classification = await context.Classifications.Where(x => x.Name == parentFolder).FirstOrDefaultAsync();
+
                     Classification? breed = null;
                     if (classificationId != null)
                         breed = await context.Classifications.FindAsync(classificationId);
 
-                    string fileFormat = System.IO.Path.GetExtension(filePath)[1..];
+                    string fileFormat = System.IO.Path.GetExtension(filePath) == ".jpg" ? ".jpeg" : System.IO.Path.GetExtension(filePath);
                     var bytes = await File.ReadAllBytesAsync(filePath);
                     Cat newCat = new Cat()
                     {
                         Approved = true,
                         IsKitty = isKitty,
-                        ClassificationId = breed == null ? null : breed.ClassificationId,
+                        ClassificationId = classification == null ? (breed == null ? null : breed.ClassificationId) : classification.ClassificationId,
                         AddedUserId = 1,
-                        FileType = "image/" + fileFormat == "jpg" ? "jpeg" : fileFormat,
+                        FileType = "image/" + fileFormat[1..],
                     };
 
                     await context.AddAsync(newCat);
                     await context.SaveChangesAsync();
 
-                    string parentFolder = path[(path.LastIndexOf('\\') + 1)..];
-                    Classification? classification = await context.Classifications.Where(x => x.Name == parentFolder).FirstOrDefaultAsync();
                     string folderName = classification == null ? (breed == null ? "NoClassification" : breed.Name) : classification.Name;
                     if (!Directory.Exists(imagesPath + "\\" + folderName))
                         Directory.CreateDirectory(imagesPath + "\\" + folderName);
 
-                    string newFilePath = imagesPath + "\\" + folderName + "\\" + newCat.CatId + (newCat.IsKitty ? "1" : "0") + System.IO.Path.GetExtension(filePath);
+                    string newFilePath = imagesPath + "\\" + folderName + "\\" + newCat.CatId + (newCat.IsKitty ? "1" : "0") + fileFormat;
                     File.Copy(filePath, newFilePath);
                 }
 
