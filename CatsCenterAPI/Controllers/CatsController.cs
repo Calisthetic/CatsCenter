@@ -16,6 +16,13 @@ namespace CatsCenterAPI.Controllers
     {
         private readonly string imagesPath = @"C:\cat_images";
         private readonly CatsCenterDbContext _context;
+        private readonly static string[] imagetypes = new string[] { 
+            "apng", "png",
+            "avif", "gif",
+            "jpg", "jfif",
+            "jpeg", "pjpeg",
+            "pjp", "webp"
+        };
 
         public CatsController(CatsCenterDbContext context)
         {
@@ -24,14 +31,16 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Cats
         [HttpGet]
-        public async Task<ActionResult<List<CatWithImage>>> GetCats(int count = 1)
+        public async Task<ActionResult<List<CatWithImage>>> GetCats(int count = 1, int classification_id = 0)
         {
             if (_context.Cats == null)
             {
                 return NotFound();
             }
+            if (count > 10)
+                return BadRequest("\"Count\" can't be bigger than 10");
 
-            return _context.Cats.Where(x => x.Approved == true && (x.Classification == null ? false : x.Classification.IsBreed) == true).OrderBy(x => Guid.NewGuid()).Take(count)
+            return _context.Cats.Where(x => x.Approved == true && x.ClassificationId == (classification_id == 0 ? x.ClassificationId : classification_id) && (x.Classification == null ? false : x.Classification.IsBreed) == true).OrderBy(x => Guid.NewGuid()).Take(count)
                 .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImage(x));
         }
 
@@ -47,8 +56,8 @@ namespace CatsCenterAPI.Controllers
         }
 
         // GET: api/Cats/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Cat>> GetCat(int id)
+        [HttpGet("{id}.{type}")]
+        public async Task<ActionResult<Cat>> GetCat(int id, string type)
         {
             try
             {
@@ -56,8 +65,10 @@ namespace CatsCenterAPI.Controllers
                 {
                     return NotFound();
                 }
+                if (id == 0 || string.IsNullOrEmpty(type))
+                    return NotFound();
 
-                var cat = await _context.Cats.Where(x => x.CatId == (id % 10 == 0 ? id / 10 : (id - 1) / 10)).Include(x => x.Classification).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.CatId == id / 10).Include(x => x.Classification).FirstOrDefaultAsync();
                 if (cat == null)
                     return NotFound("There's no image in database");
                 if (cat.Approved == false)
@@ -67,12 +78,15 @@ namespace CatsCenterAPI.Controllers
                 if (cat.Classification != null)
                     classificationFolder = cat.Classification.Name;
 
-                string fileType = cat.FileType[6..];
-                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
+                string fileType = imagetypes.Any(str => str == type.ToLower()) ? "image/" + type : string.Empty;
+                if (string.IsNullOrEmpty(fileType))
+                    return NotFound("Incorrect file type");
+
+                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + cat.FileType[6..];
                 if (System.IO.File.Exists(path))
                 {
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);
-                    return File(bytes, cat.FileType);
+                    return File(bytes, imagetypes.Any(str => str == type.ToLower()) ? "image/" + type : cat.FileType);
                 }
                 else
                 {
