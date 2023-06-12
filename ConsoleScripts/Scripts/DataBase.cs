@@ -1,4 +1,5 @@
 ﻿using CatsCenterAPI.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace ConsoleScripts.Scripts
                     if (classificationId != null)
                         breed = await context.Classifications.FindAsync(classificationId);
 
+                    string fileFormat = System.IO.Path.GetExtension(filePath)[1..];
                     var bytes = await File.ReadAllBytesAsync(filePath);
                     Cat newCat = new Cat()
                     {
@@ -36,18 +38,26 @@ namespace ConsoleScripts.Scripts
                         IsKitty = isKitty,
                         ClassificationId = breed == null ? null : breed.ClassificationId,
                         AddedUserId = 1,
-                        FileType = "image/" + System.IO.Path.GetExtension(filePath)[1..],
+                        FileType = "image/" + fileFormat == "jpg" ? "jpeg" : fileFormat,
                     };
 
                     await context.AddAsync(newCat);
                     await context.SaveChangesAsync();
 
-                    string folderName = breed == null ? "NoClassification" : breed.Name;
+                    string parentFolder = path[(path.LastIndexOf('\\') + 1)..];
+                    Classification? classification = await context.Classifications.Where(x => x.Name == parentFolder).FirstOrDefaultAsync();
+                    string folderName = classification == null ? (breed == null ? "NoClassification" : breed.Name) : classification.Name;
                     if (!Directory.Exists(imagesPath + "\\" + folderName))
                         Directory.CreateDirectory(imagesPath + "\\" + folderName);
 
                     string newFilePath = imagesPath + "\\" + folderName + "\\" + newCat.CatId + (newCat.IsKitty ? "1" : "0") + System.IO.Path.GetExtension(filePath);
                     File.Copy(filePath, newFilePath);
+                }
+
+                var directoriesFromDir = Directory.GetDirectories(path);
+                foreach (string directory in directoriesFromDir)
+                {
+                    await GetImagesByFolder(directory, classificationId, isKitty);
                 }
             }
             catch { }
