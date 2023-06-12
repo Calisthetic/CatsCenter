@@ -4,8 +4,8 @@
     {
         public CatWithImage(Cat cat)
         {
-            CatImage = "https://localhost:7288/api/Cat/" + cat.CatId;
-            AddedUserName = cat.AddedUser.Name;
+            CatImage = "https://localhost:7288/api/Cats/" + cat.CatId + (cat.IsKitty ? "1" : "0");
+            AddedUserName = cat.AddedUser == null ? null : cat.AddedUser.Name;
             IsKitty = cat.IsKitty;
             ClassificationName = cat.Classification == null ? "none" : cat.Classification.Name;
         }

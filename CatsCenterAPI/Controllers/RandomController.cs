@@ -22,7 +22,7 @@ namespace CatsCenterAPI.Controllers
         {
             for (int i = 0; i < 10; i++)
             {
-                var cat = await _context.Cats.Where(x => x.Approved == true).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.Approved == true).Include(x => x.Classification).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
 
                 if (cat == null)
                     continue;
@@ -32,7 +32,7 @@ namespace CatsCenterAPI.Controllers
                     classificationFolder = cat.Classification.Name;
 
                 string fileType = cat.FileType[6..];
-                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);
@@ -52,7 +52,7 @@ namespace CatsCenterAPI.Controllers
         {
             for (int i = 0; i < 10; i++)
             {
-                var cat = await _context.Cats.Where(x => x.Approved == true && x.Classification.IsBreed == false).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.Approved == true && x.Classification.IsBreed == true).Include(x => x.Classification).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
 
                 if (cat == null)
                     continue;
@@ -62,7 +62,7 @@ namespace CatsCenterAPI.Controllers
                     classificationFolder = cat.Classification.Name;
 
                 string fileType = cat.FileType[6..];
-                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);
@@ -82,7 +82,7 @@ namespace CatsCenterAPI.Controllers
         {
             for (int i = 0; i < 10; i++)
             {
-                var cat = await _context.Cats.Where(x => x.Approved == true && x.Classification.IsBreed == true).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.Approved == true && x.Classification.IsBreed == false).Include(x => x.Classification).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
 
                 if (cat == null)
                     continue;
@@ -92,7 +92,7 @@ namespace CatsCenterAPI.Controllers
                     classificationFolder = cat.Classification.Name;
 
                 string fileType = cat.FileType[6..];
-                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0")    + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);

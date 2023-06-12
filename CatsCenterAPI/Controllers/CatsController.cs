@@ -57,7 +57,7 @@ namespace CatsCenterAPI.Controllers
                     return NotFound();
                 }
 
-                var cat = await _context.Cats.Where(x => x.CatId == id).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.CatId == (id % 10 == 0 ? id / 10 : (id - 1) / 10)).Include(x => x.Classification).FirstOrDefaultAsync();
                 if (cat == null)
                     return NotFound("There's no image in database");
                 if (cat.Approved == false)
@@ -68,7 +68,7 @@ namespace CatsCenterAPI.Controllers
                     classificationFolder = cat.Classification.Name;
 
                 string fileType = cat.FileType[6..];
-                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
                 if (System.IO.File.Exists(path))
                 {
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);
@@ -141,16 +141,16 @@ namespace CatsCenterAPI.Controllers
                         await _context.SaveChangesAsync();
 
                         // If image already exist
-                        if (Path.Exists(path + "\\" + cat.CatId + "." + fileType))
+                        if (Path.Exists(path + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType))
                         {
                             // Get that file(s)
-                            string[] repeatedFiles = Directory.GetFiles(path, cat.CatId + "." + fileType);
+                            string[] repeatedFiles = Directory.GetFiles(path, cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType);
 
                             if (!Directory.Exists(imagesPath + "\\Unexpected"))
                                 Directory.CreateDirectory(imagesPath + "\\Unexpected");
                             foreach (var repeatedFilePath in repeatedFiles)
                             {
-                                string unexpectedFilePath = imagesPath + "\\Unexpected\\" + cat.CatId + "." + fileType;
+                                string unexpectedFilePath = imagesPath + "\\Unexpected\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
                                 if (System.IO.File.Exists(unexpectedFilePath))
                                     System.IO.File.Delete(unexpectedFilePath);
 
@@ -160,7 +160,7 @@ namespace CatsCenterAPI.Controllers
                             }
                         }
                         // Add image
-                        string filepath = Path.Combine(path, cat.CatId + "." + fileType);
+                        string filepath = Path.Combine(path, cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType);
                         using (Stream stream = new FileStream(filepath, FileMode.Create))
                         {
                             file.CopyTo(stream);
@@ -202,7 +202,7 @@ namespace CatsCenterAPI.Controllers
                 classificationFolder = cat.Classification.Name;
 
             string fileType = cat.FileType[6..];
-            string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + "." + fileType;
+            string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
             if (System.IO.File.Exists(path))
                 System.IO.File.Delete(path);
 
