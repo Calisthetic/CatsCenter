@@ -14,7 +14,6 @@ namespace CatsCenterAPI.Controllers
     [ApiController]
     public class CatsController : ControllerBase
     {
-        private readonly string imagesPath = @"C:\cat_images";
         private readonly CatsCenterDbContext _context;
         private readonly static string[] imagetypes = new string[] { 
             "apng", "png",
@@ -82,7 +81,7 @@ namespace CatsCenterAPI.Controllers
                 if (string.IsNullOrEmpty(fileType))
                     return NotFound("Incorrect file type");
 
-                string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + cat.FileType[6..];
+                string path = Configuration.imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + cat.FileType[6..];
                 if (System.IO.File.Exists(path))
                 {
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(path);
@@ -117,7 +116,7 @@ namespace CatsCenterAPI.Controllers
                     return BadRequest("DataBase error");
 
 
-                string path = imagesPath;
+                string path = Configuration.imagesPath;
 
                 if (catImage.ClassificationId != null)
                 {
@@ -160,11 +159,11 @@ namespace CatsCenterAPI.Controllers
                             // Get that file(s)
                             string[] repeatedFiles = Directory.GetFiles(path, cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType);
 
-                            if (!Directory.Exists(imagesPath + "\\Unexpected"))
-                                Directory.CreateDirectory(imagesPath + "\\Unexpected");
+                            if (!Directory.Exists(Configuration.imagesPath + "\\Unexpected"))
+                                Directory.CreateDirectory(Configuration.imagesPath + "\\Unexpected");
                             foreach (var repeatedFilePath in repeatedFiles)
                             {
-                                string unexpectedFilePath = imagesPath + "\\Unexpected\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
+                                string unexpectedFilePath = Configuration.imagesPath + "\\Unexpected\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
                                 if (System.IO.File.Exists(unexpectedFilePath))
                                     System.IO.File.Delete(unexpectedFilePath);
 
@@ -216,7 +215,7 @@ namespace CatsCenterAPI.Controllers
                 classificationFolder = cat.Classification.Name;
 
             string fileType = cat.FileType[6..];
-            string path = imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
+            string path = Configuration.imagesPath + "\\" + classificationFolder + "\\" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + fileType;
             if (System.IO.File.Exists(path))
                 System.IO.File.Delete(path);
 

@@ -33,7 +33,7 @@ namespace ConsoleScripts.Scripts
                         breed = await context.Classifications.FindAsync(classificationId);
 
                     // Get file format, image bytes and 0 or 1 as bool for cat.IsKitty
-                    string fileFormat = System.IO.Path.GetExtension(filePath) == ".jpg" ? ".jpeg" : System.IO.Path.GetExtension(filePath);
+                    string fileFormat = System.IO.Path.GetExtension(filePath) == ".jpg" || Path.GetExtension(filePath) == ".jfif" ? ".jpeg" : System.IO.Path.GetExtension(filePath);
                     var bytes = await File.ReadAllBytesAsync(filePath);
                     var kittyTrigger = Path.GetFileName(filePath).Substring(Path.GetFileName(filePath).IndexOf(".") - 1, 1);
 
