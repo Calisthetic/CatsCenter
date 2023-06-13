@@ -1,6 +1,6 @@
 ﻿namespace CatsCenterAPI.Models.DataTransferObjects
 {
-    public class UploadCatImage
+    public class UploadCatImageDto
     {
         public List<IFormFile> File { get; set; }
 

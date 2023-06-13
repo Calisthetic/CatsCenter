@@ -30,7 +30,7 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Cats
         [HttpGet]
-        public async Task<ActionResult<List<CatWithImage>>> GetCats(int count = 1, int classification_id = 0)
+        public async Task<ActionResult<List<CatWithImageDto>>> GetCats(int count = 1, int classification_id = 0)
         {
             if (_context.Cats == null)
             {
@@ -40,7 +40,7 @@ namespace CatsCenterAPI.Controllers
                 return BadRequest("\"Count\" can't be bigger than 10");
 
             return _context.Cats.Where(x => x.Approved == true && x.ClassificationId == (classification_id == 0 ? x.ClassificationId : classification_id) && (x.Classification == null ? false : x.Classification.IsBreed) == true).OrderBy(x => Guid.NewGuid()).Take(count)
-                .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImage(x));
+                .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImageDto(x));
         }
 
         [HttpGet("Total")]
@@ -101,8 +101,26 @@ namespace CatsCenterAPI.Controllers
             }
         }
 
+        [HttpGet("Info/{id}")]
+        public async Task<ActionResult<Cat>> GetCatInfo(int id)
+        {
+            if (_context.Cats == null)
+                return NotFound();
+
+            var cat = _context.Cats.Where(x => x.CatId == id).Include(x => x.AddedUser)
+                .Include(x => x.Classification).ThenInclude(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
+                .Include(x => x.Classification).ThenInclude(x => x.LocationsOfClassifications).ThenInclude(x => x.Location)
+                .Include(x => x.Classification).ThenInclude(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
+                .Include(x => x.Classification).ThenInclude(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
+            .ToList().ConvertAll(x => new CatInfoDto(x)).FirstOrDefault();
+            if (cat == null) 
+                return NotFound();
+
+            return Ok(cat);
+        }
+
         [HttpPost]
-        public async Task<ActionResult<Cat>> UploadCatImage([FromForm] UploadCatImage catImage)
+        public async Task<ActionResult<Cat>> UploadCatImage([FromForm] UploadCatImageDto catImage)
         {
             try
             {

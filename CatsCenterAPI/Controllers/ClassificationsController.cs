@@ -25,7 +25,7 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Classifications
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassificationsSearch>>> GetClassifications(string find = "", string body_type = "", string coat_pattern = "", string coat_type = "", string location = "")
+        public async Task<ActionResult<IEnumerable<ClassificationsSearchDto>>> GetClassifications(string find = "", string body_type = "", string coat_pattern = "", string coat_type = "", string location = "")
         {
             //// Header value
             //StringValues values;
@@ -64,7 +64,7 @@ namespace CatsCenterAPI.Controllers
             {
                 result = result.Where(x => x.LocationsOfClassifications.Any(str => str.Location.Name.ToLower().Contains(location.ToLower()) == true) == true).ToList();
             }
-            return result.ConvertAll(x => new ClassificationsSearch(x));
+            return result.ConvertAll(x => new ClassificationsSearchDto(x));
         }
 
         [HttpGet("{section}")]

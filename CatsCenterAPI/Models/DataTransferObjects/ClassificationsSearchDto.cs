@@ -1,8 +1,8 @@
 ﻿namespace CatsCenterAPI.Models.DataTransferObjects
 {
-    public class ClassificationsSearch
+    public class ClassificationsSearchDto
     {
-        public ClassificationsSearch(Classification classification)
+        public ClassificationsSearchDto(Classification classification)
         {
             id = classification.ClassificationId;
             name = classification.Name;

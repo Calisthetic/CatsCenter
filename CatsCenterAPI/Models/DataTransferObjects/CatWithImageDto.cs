@@ -1,8 +1,8 @@
 ﻿namespace CatsCenterAPI.Models.DataTransferObjects
 {
-    public class CatWithImage
+    public class CatWithImageDto
     {
-        public CatWithImage(Cat cat)
+        public CatWithImageDto(Cat cat)
         {
             CatImage = "https://localhost:7288/api/Cats/" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + 
                 (cat.FileType[6..] == "jpeg" ? "jpg" : cat.FileType[6..]);
