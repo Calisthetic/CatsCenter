@@ -211,6 +211,37 @@ namespace CatsCenterAPI.Controllers
             }
         }
 
+        // PUT: api/Cats/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCat(int id, Cat cat)
+        {
+            if (id != cat.CatId)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(cat).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CatExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok();
+        }
+        
+
         // DELETE: api/Cats/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCat(int id)

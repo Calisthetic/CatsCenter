@@ -20,7 +20,7 @@ public partial class Cat
 
     public virtual User? AddedUser { get; set; }
     [JsonIgnore]
-    public virtual ICollection<CategoriesOfCat> CategoriesOfCats { get; set; } = new List<CategoriesOfCat>();
+    public virtual ICollection<CategoriesOfCat>? CategoriesOfCats { get; set; } = new List<CategoriesOfCat>();
 
     public virtual Classification? Classification { get; set; }
 }
