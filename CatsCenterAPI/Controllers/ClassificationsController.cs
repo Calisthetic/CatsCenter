@@ -77,12 +77,12 @@ namespace CatsCenterAPI.Controllers
                 case "felids":
                     if (_context.Classifications == null)
                         return NotFound();
-                    return Ok(await _context.Classifications.Where(x => x.IsBreed == false).ToListAsync());
+                    return Ok(_context.Classifications.Where(x => x.IsBreed == false).ToList().ConvertAll(x => new ClassificationsWithImageDto(x)));
                 case "br":
                 case "breeds":
                     if (_context.Classifications == null)
                         return NotFound();
-                    return Ok(await _context.Classifications.Where(x => x.IsBreed == true).ToListAsync());
+                    return Ok(_context.Classifications.Where(x => x.IsBreed == true).ToList().ConvertAll(x => new ClassificationsWithImageDto(x)));
                 case "ct":
                 case "coattypes":
                 case "coat_types":
@@ -106,11 +106,11 @@ namespace CatsCenterAPI.Controllers
                     if (_context.Locations == null)
                         return NotFound();
                     return Ok(await _context.Locations.ToListAsync());
-                case "cl":
-                case "classifications":
+                case "ctg":
+                case "categories":
                     if (_context.Classifications == null)
                         return NotFound();
-                    return Ok(await _context.Classifications.Where(x => x.IsBreed == false).ToListAsync());
+                    return Ok(await _context.Categories.ToListAsync());
                 default:
                     return BadRequest("Wrong {section}");
             }

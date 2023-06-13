@@ -7,8 +7,7 @@ namespace CatsCenterAPI.Models.DataTransferObjects
         public CatInfoDto(Cat cat)
         {
             CatId = cat.CatId;
-            CatImage = "https://localhost:7288/api/Cats/" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." +
-                (cat.FileType[6..] == "jpeg" ? "jpg" : cat.FileType[6..]);
+            CatImage = "https://localhost:7288/api/Cats/" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + cat.FileType[6..];
             AddedUserName = cat.AddedUser == null ? "Admin" : cat.AddedUser.Name;
             Age = cat.IsKitty ? "Kitten" : "Adult";
             Classification = cat.Classification == null ? null : new ClassificationsSearchDto(cat.Classification);
