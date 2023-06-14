@@ -44,20 +44,9 @@ namespace CatsCenterAPI.Controllers
                 .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImageDto(x));
         }
 
-        [HttpGet("Total")]
-        public async Task<ActionResult<int>> GetCatsCount()
-        {
-            if (_context.Cats == null)
-            {
-                return NotFound();
-            }
-
-            return await _context.Cats.CountAsync();
-        }
-
         // GET: api/Cats/5
         [HttpGet("{id}.{type}")]
-        public async Task<ActionResult<Cat>> GetCat(int id, string type)
+        public async Task<ActionResult> GetCat(int id, string type)
         {
             try
             {
@@ -68,7 +57,7 @@ namespace CatsCenterAPI.Controllers
                 if (id == 0 || string.IsNullOrEmpty(type))
                     return NotFound();
 
-                var cat = await _context.Cats.Where(x => x.CatId == id / 10).Include(x => x.Classification).FirstOrDefaultAsync();
+                var cat = await _context.Cats.Where(x => x.CatId == id).Include(x => x.Classification).FirstOrDefaultAsync();
                 if (cat == null)
                     return NotFound("There's no image in database");
                 if (cat.Approved == false)
@@ -100,6 +89,47 @@ namespace CatsCenterAPI.Controllers
             {
                 return BadRequest(ex.Message.ToString());
             }
+        }
+
+        // GET: api/Cats/Total
+        [HttpGet("Total")]
+        public async Task<ActionResult<int>> GetCatsCount()
+        {
+            if (_context.Cats == null)
+            {
+                return NotFound();
+            }
+
+            return await _context.Cats.CountAsync();
+        }
+
+        // GET: api/Cats/Search
+        [HttpGet("Search")]
+        public async Task<ActionResult<IEnumerable<CatWithImageDto>>> GetCatsSearch(string body_type = "", string coat_pattern = "", string coat_type = "", string location = "")
+        {
+            if (_context.Classifications == null)
+            {
+                return NotFound();
+            }
+
+            int bodyTypeId = int.TryParse(body_type, out int id1) ? id1 : 0;
+            int locationId = int.TryParse(location, out int id2) ? id2 : 0;
+            int coatTypeId = int.TryParse(coat_type, out int id3) ? id3 : 0;
+            int coatPatternId = int.TryParse(coat_pattern, out int id4) ? id4 : 0;
+
+            var result = await _context.Classifications
+                .Include(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
+                .Include(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
+                .Include(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
+                .Include(x => x.LocationsOfClassifications).ThenInclude(x => x.Location).Where(
+                    x => x.BodyTypesOfClassifications.Any(s => s.BodyType.Name.ToLower().Contains(body_type.ToLower()) == true || s.BodyTypeId == bodyTypeId) == true
+                    && x.CoatPatternsOfClassifications.Any(s => s.CoatPattern.Name.ToLower().Contains(coat_pattern.ToLower()) == true || s.CoatPatternId == coatPatternId) == true
+                    && x.CoatTypesOfClassifications.Any(s => s.CoatType.Name.ToLower().Contains(coat_type.ToLower()) == true || s.CoatTypeId == coatTypeId) == true
+                    && x.LocationsOfClassifications.Any(s => s.Location.Name.ToLower().Contains(location.ToLower()) == true || s.LocationId == locationId) == true
+                ).ToListAsync();
+
+            return _context.Cats.Include(x => x.AddedUser).AsEnumerable().Where(x => result.Any(s => s.ClassificationId == x.ClassificationId) == true)
+                .OrderBy(x => Guid.NewGuid()).Take(10).ToList().ConvertAll(x => new CatWithImageDto(x));
         }
 
         [HttpGet("Info/{id}")]
@@ -263,7 +293,6 @@ namespace CatsCenterAPI.Controllers
                 }
                 return Ok();
             }
-
             return NotFound();
         }
         
