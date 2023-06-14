@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CatsCenterAPI.Models;
 using CatsCenterAPI.Models.DataTransferObjects;
+using Microsoft.VisualBasic.FileIO;
 
 namespace CatsCenterAPI.Controllers
 {
@@ -213,32 +214,67 @@ namespace CatsCenterAPI.Controllers
 
         // PUT: api/Cats/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCat(int id, Cat cat)
+        public async Task<IActionResult> PutCat(int id, ChangeCatDto cat)
         {
-            if (id != cat.CatId)
+            if (id != cat.CatId && !CatExists(id))
             {
                 return BadRequest();
             }
 
-            _context.Entry(cat).State = EntityState.Modified;
-
-            try
+            Cat? currentCat = await _context.Cats.Include(x => x.Classification).FirstOrDefaultAsync(x => x.CatId == id);
+            string oldFilePath = string.Empty;
+            if (currentCat != null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CatExists(id))
+                oldFilePath = Configuration.imagesPath + "\\" + (currentCat.Classification == null ? "NoClassification" : currentCat.Classification.Name)
+                        + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
+
+                Classification? classification = await _context.Classifications.FirstOrDefaultAsync(x => x.ClassificationId == currentCat.ClassificationId);
+                if (classification != null)
                 {
-                    return NotFound();
+                    currentCat.Classification = classification;
+                    currentCat.ClassificationId = cat.ClassificationId;
                 }
-                else
+                currentCat.AddedUserId = cat.AddedUserId;
+                currentCat.IsKitty = cat.IsKitty;
+                currentCat.Approved = cat.Approved;
+
+
+                //_context.Entry(cat).State = EntityState.Modified;
+
+                try
                 {
-                    throw;
+                    await _context.SaveChangesAsync();
+
+                    string newFilePath = Configuration.imagesPath + "\\" + (currentCat.Classification == null ? "NoClassification" : currentCat.Classification.Name)
+                        + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
+                    if (oldFilePath != newFilePath)
+                    {
+                        if (System.IO.File.Exists(newFilePath))
+                            System.IO.File.Delete(newFilePath);
+
+                        System.IO.File.Copy(oldFilePath, newFilePath);
+                        System.IO.File.Delete(oldFilePath);
+                    }
                 }
+                //catch (DbUpdateConcurrencyException)
+                //{
+                //    if (!CatExists(id))
+                //    {
+                //        return NotFound();
+                //    }
+                //    else
+                //    {
+                //        throw;
+                //    }
+                //}
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+                return Ok();
             }
 
-            return Ok();
+            return NotFound();
         }
         
 
