@@ -221,13 +221,16 @@ namespace CatsCenterAPI.Controllers
                 return BadRequest();
             }
 
+            // Search current cat
             Cat? currentCat = await _context.Cats.Include(x => x.Classification).FirstOrDefaultAsync(x => x.CatId == id);
             string oldFilePath = string.Empty;
             if (currentCat != null)
             {
+                // Get current filepath
                 oldFilePath = Configuration.imagesPath + "\\" + (currentCat.Classification == null ? "NoClassification" : currentCat.Classification.Name)
                         + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
 
+                // Search c;assification and change current cat
                 Classification? classification = await _context.Classifications.FirstOrDefaultAsync(x => x.ClassificationId == currentCat.ClassificationId);
                 if (classification != null)
                 {
@@ -238,13 +241,11 @@ namespace CatsCenterAPI.Controllers
                 currentCat.IsKitty = cat.IsKitty;
                 currentCat.Approved = cat.Approved;
 
-
-                //_context.Entry(cat).State = EntityState.Modified;
-
                 try
                 {
                     await _context.SaveChangesAsync();
 
+                    // Changing filenamme and filepath
                     string newFilePath = Configuration.imagesPath + "\\" + (currentCat.Classification == null ? "NoClassification" : currentCat.Classification.Name)
                         + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
                     if (oldFilePath != newFilePath)
@@ -256,17 +257,6 @@ namespace CatsCenterAPI.Controllers
                         System.IO.File.Delete(oldFilePath);
                     }
                 }
-                //catch (DbUpdateConcurrencyException)
-                //{
-                //    if (!CatExists(id))
-                //    {
-                //        return NotFound();
-                //    }
-                //    else
-                //    {
-                //        throw;
-                //    }
-                //}
                 catch (Exception ex)
                 {
                     return BadRequest(ex.Message);
