@@ -136,12 +136,13 @@ namespace CatsCenterAPI.Controllers
         }
 
         [HttpGet("Info/{id}")]
-        public async Task<ActionResult<Cat>> GetCatInfo(int id)
+        public async Task<ActionResult<CatInfoDto>> GetCatInfo(int id)
         {
             if (_context.Cats == null)
                 return NotFound();
 
             var cat = _context.Cats.Where(x => x.CatId == id).Include(x => x.AddedUser)
+                //.Include(x => x.CategoriesOfCats).ThenInclude(x => x.Category)
                 .Include(x => x.Classification).ThenInclude(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
                 .Include(x => x.Classification).ThenInclude(x => x.LocationsOfClassifications).ThenInclude(x => x.Location)
                 .Include(x => x.Classification).ThenInclude(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
@@ -150,7 +151,7 @@ namespace CatsCenterAPI.Controllers
             if (cat == null) 
                 return NotFound();
 
-            return Ok(cat);
+            return cat;
         }
 
         [HttpPost]

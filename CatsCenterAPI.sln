@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatsCenterAPI", "CatsCenterAPI\CatsCenterAPI.csproj", "{82B520E7-9105-44C3-8212-05EAD320440B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleScripts", "ConsoleScripts\ConsoleScripts.csproj", "{E99EF95F-3AB3-410B-A392-0A23AA6097AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleScripts", "ConsoleScripts\ConsoleScripts.csproj", "{E99EF95F-3AB3-410B-A392-0A23AA6097AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

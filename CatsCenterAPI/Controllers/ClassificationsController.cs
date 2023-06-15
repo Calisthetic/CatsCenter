@@ -94,7 +94,7 @@ namespace CatsCenterAPI.Controllers
                     return Ok(await _context.Locations.ToListAsync());
                 case "ctg":
                 case "categories":
-                    if (_context.Classifications == null)
+                    if (_context.Categories == null)
                         return NotFound();
                     return Ok(await _context.Categories.ToListAsync());
                 default:
