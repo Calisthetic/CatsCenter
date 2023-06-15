@@ -31,16 +31,17 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Cats
         [HttpGet]
-        public async Task<ActionResult<List<CatWithImageDto>>> GetCats(int count = 1, int classification_id = 0)
+        public async Task<ActionResult<List<CatWithImageDto>>> GetCats(int count = 4, int classification_id = 0)
         {
             if (_context.Cats == null)
             {
                 return NotFound();
             }
-            if (count > 10)
-                return BadRequest("\"Count\" can't be bigger than 10");
+            if (count > 24)
+                return BadRequest("\"Count\" can't be bigger than 24");
 
-            return _context.Cats.Where(x => x.Approved == true && x.ClassificationId == (classification_id == 0 ? x.ClassificationId : classification_id) && (x.Classification == null ? false : x.Classification.IsBreed) == true).OrderBy(x => Guid.NewGuid()).Take(count)
+            return _context.Cats.Where(x => x.Approved == true && x.ClassificationId == (classification_id == 0 ? x.ClassificationId : classification_id)
+                && (x.Classification != null && x.Classification.IsBreed) == true).OrderBy(x => Guid.NewGuid()).Take(count)
                 .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImageDto(x));
         }
 
@@ -105,12 +106,14 @@ namespace CatsCenterAPI.Controllers
 
         // GET: api/Cats/Search
         [HttpGet("Search")]
-        public async Task<ActionResult<IEnumerable<CatWithImageDto>>> GetCatsSearch(string body_type = "", string coat_pattern = "", string coat_type = "", string location = "")
+        public async Task<ActionResult<IEnumerable<CatWithImageDto>>> GetCatsSearch(int count = 4, string body_type = "", string coat_pattern = "", string coat_type = "", string location = "")
         {
             if (_context.Classifications == null)
             {
                 return NotFound();
             }
+            if (count > 10)
+                return BadRequest("\"Count\" can't be bigger than 10");
 
             int bodyTypeId = int.TryParse(body_type, out int id1) ? id1 : 0;
             int locationId = int.TryParse(location, out int id2) ? id2 : 0;
@@ -129,7 +132,7 @@ namespace CatsCenterAPI.Controllers
                 ).ToListAsync();
 
             return _context.Cats.Include(x => x.AddedUser).AsEnumerable().Where(x => result.Any(s => s.ClassificationId == x.ClassificationId) == true)
-                .OrderBy(x => Guid.NewGuid()).Take(10).ToList().ConvertAll(x => new CatWithImageDto(x));
+                .OrderBy(x => Guid.NewGuid()).Take(count).ToList().ConvertAll(x => new CatWithImageDto(x));
         }
 
         [HttpGet("Info/{id}")]

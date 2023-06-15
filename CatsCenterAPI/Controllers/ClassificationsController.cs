@@ -42,28 +42,14 @@ namespace CatsCenterAPI.Controllers
                 .Include(x => x.BodyTypesOfClassifications).ThenInclude(x => x.BodyType)
                 .Include(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
                 .Include(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
-                .Include(x => x.LocationsOfClassifications).ThenInclude(x => x.Location).ToListAsync();
+                .Include(x => x.LocationsOfClassifications).ThenInclude(x => x.Location)
+                .Where(x => x.Name.ToLower().Contains(find.ToLower()) == true)
+                .Where(x => x.BodyTypesOfClassifications.Any(str => str.BodyType.Name.ToLower().Contains(body_type.ToLower()) == true) == true)
+                .Where(x => x.CoatPatternsOfClassifications.Any(str => str.CoatPattern.Name.ToLower().Contains(coat_pattern.ToLower()) == true) == true)
+                .Where(x => x.CoatTypesOfClassifications.Any(str => str.CoatType.Name.ToLower().Contains(coat_type.ToLower()) == true) == true)
+                .Where(x => x.LocationsOfClassifications.Any(str => str.Location.Name.ToLower().Contains(location.ToLower()) == true) == true)
+                .ToListAsync();
 
-            if (find.ToLower() != "")
-            {
-                result = result.Where(x => x.Name.ToLower().Contains(find) == true).ToList();
-            }
-            if (body_type.ToLower() != "")
-            {
-                result = result.Where(x => x.BodyTypesOfClassifications.Any(str => str.BodyType.Name.ToLower().Contains(body_type.ToLower()) == true) == true).ToList();
-            }
-            if (coat_pattern.ToLower() != "")
-            {
-                result = result.Where(x => x.CoatPatternsOfClassifications.Any(str => str.CoatPattern.Name.ToLower().Contains(coat_pattern.ToLower()) == true) == true).ToList();
-            }
-            if (coat_type.ToLower() != "")
-            {
-                result = result.Where(x => x.CoatTypesOfClassifications.Any(str => str.CoatType.Name.ToLower().Contains(coat_type.ToLower()) == true) == true).ToList();
-            }
-            if (location.ToLower() != "")
-            {
-                result = result.Where(x => x.LocationsOfClassifications.Any(str => str.Location.Name.ToLower().Contains(location.ToLower()) == true) == true).ToList();
-            }
             return result.ConvertAll(x => new ClassificationsSearchDto(x));
         }
 
@@ -114,11 +100,6 @@ namespace CatsCenterAPI.Controllers
                 default:
                     return BadRequest("Wrong {section}");
             }
-        }
-
-        private bool ClassificationExists(int id)
-        {
-            return (_context.Classifications?.Any(e => e.ClassificationId == id)).GetValueOrDefault();
         }
     }
 }
