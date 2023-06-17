@@ -275,7 +275,7 @@ namespace CatsCenterAPI.Controllers
                 oldFilePath = Configuration.imagesPath + "\\" + (currentCat.Classification == null ? "NoClassification" : currentCat.Classification.Name)
                         + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
 
-                // Search c;assification and change current cat
+                // Search classification and change current cat
                 Classification? classification = await _context.Classifications.FirstOrDefaultAsync(x => x.ClassificationId == cat.ClassificationId);
                 if (classification != null)
                 {
@@ -286,13 +286,39 @@ namespace CatsCenterAPI.Controllers
                 currentCat.IsKitty = cat.IsKitty;
                 currentCat.Approved = cat.Approved;
 
+                // Set cat categories
                 if (cat.CategoryIds != null && _context.CategoriesOfCats != null)
                 {
-                    for (int i = 0; i < cat.CategoryIds.Length; i++) 
+                    for (int i = 0; i < cat.CategoryIds.Length; i++)
                     {
-                        if (_context.Categories.FirstOrDefault(e => e.CategoryId == cat.CategoryIds[i]) != null)
+                        // Проверка на существование категории в бд
+                        if (await _context.Categories.FirstOrDefaultAsync(e => e.CategoryId == cat.CategoryIds[i]) != null)
                         {
-                            _context.CategoriesOfCats.Add(new CategoriesOfCat() { CategoryId = cat.CategoryIds[i], CatId = id });
+                            // Проверка на существование повтора в бд
+                            if (await _context.CategoriesOfCats.FirstOrDefaultAsync(x => x.CategoryId == cat.CategoryIds[i] && x.CatId == cat.CatId) == null)
+                            {
+                                await _context.CategoriesOfCats.AddAsync(new CategoriesOfCat() { CategoryId = cat.CategoryIds[i], CatId = cat.CatId });
+                            }
+                        }
+                    }
+                    // Существующие категории к котикам
+                    List<CategoriesOfCat> existCategories = await _context.CategoriesOfCats.Where(x => x.CatId == cat.CatId).ToListAsync();
+
+                    // Удаляем существующие категории если массив новых пуст
+                    if (cat.CategoryIds.Length == 0)
+                    {
+                        _context.CategoriesOfCats.RemoveRange(existCategories);
+                    }
+                    // Иначе сверяем имеющиеся категории с новыми
+                    else
+                    {
+                        for (int i = 0; i < existCategories.Count(); i++)
+                        {
+                            // Если старая категория отсутствует в списке новых, тогда удаляем
+                            if (cat.CategoryIds.Any(s => s == existCategories[i].CategoryId) == false)
+                            {
+                                _context.CategoriesOfCats.Remove(existCategories[i]);
+                            }
                         }
                     }
                 }
