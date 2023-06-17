@@ -8,6 +8,11 @@ Connection string to localhost
 Scaffold-DbContext "Data Source=DESKTOP-GJJERNN;Initial Catalog=CatsCenterDB;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
 ```
 
+###
+
+- [Cors](https://learn.microsoft.com/en-us/aspnet/web-api/overview/security/enabling-cross-origin-requests-in-web-api)
+- [Cors for api](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-7.0)
+
 ## Links
 
 - [Cat breeds](https://en.wikipedia.org/wiki/List_of_cat_breeds)

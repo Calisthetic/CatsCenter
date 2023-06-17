@@ -7,9 +7,8 @@ namespace CatsCenterAPI.Models.DataTransferObjects
         public CatInfoDto(Cat cat)
         {
             CatId = cat.CatId;
-            CatImage = "https://localhost:7288/api/Cats/" + cat.CatId + (cat.IsKitty ? "1" : "0") + "." + cat.FileType[6..];
+            CatImage = "https://localhost:7288/api/Cats/" + cat.CatId + "." + cat.FileType[6..];
             AddedUserName = cat.AddedUser == null ? "Admin" : cat.AddedUser.Name;
-            Age = cat.IsKitty ? "Kitten" : "Adult";
             IsKitty = cat.IsKitty;
             Classification = cat.Classification == null ? null : new ClassificationsSearchDto(cat.Classification);
             Categories = new CatsCenterDbContext().Categories.AsEnumerable().Where(x => x.CategoriesOfCats.Any(c => c.CatId == cat.CatId) == true).ToList();
@@ -23,8 +22,6 @@ namespace CatsCenterAPI.Models.DataTransferObjects
 
         [JsonPropertyName("added_user")]
         public string AddedUserName { get; set; }
-
-        public string Age { get; set; }
 
         [JsonPropertyName("is_kitty")]
         public bool IsKitty { get; set; }

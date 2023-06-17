@@ -10,13 +10,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Added code
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var MyAllowSpecificOrigins = "MyPolicy";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000");
+            policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
         });
 });
 
@@ -32,12 +32,14 @@ if (app.Environment.IsDevelopment())
 }
 
 // Added code
-app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseStaticFiles();
+app.UseRouting();
 
 app.MapControllers();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.Run();

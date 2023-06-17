@@ -8,9 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using CatsCenterAPI.Models;
 using CatsCenterAPI.Models.DataTransferObjects;
 using Microsoft.VisualBasic.FileIO;
+using Microsoft.AspNetCore.Cors;
+using System.Diagnostics;
 
 namespace CatsCenterAPI.Controllers
 {
+    [EnableCors("MyPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class CatsController : ControllerBase
@@ -45,8 +48,15 @@ namespace CatsCenterAPI.Controllers
                 .Include(x => x.Classification).Include(x => x.AddedUser).ToList().ConvertAll(x => new CatWithImageDto(x));
         }
 
+        /// <summary>
+        /// Описание
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <example>GET api/Cats/10000.jpeg</example>
         // GET: api/Cats/5
-        [HttpGet("{id}.{type}")]
+        [HttpGet("{id}.{type}", Name = nameof(GetCat))]
         public async Task<ActionResult> GetCat(int id, string type)
         {
             try
@@ -265,7 +275,7 @@ namespace CatsCenterAPI.Controllers
                         + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
 
                 // Search c;assification and change current cat
-                Classification? classification = await _context.Classifications.FirstOrDefaultAsync(x => x.ClassificationId == currentCat.ClassificationId);
+                Classification? classification = await _context.Classifications.FirstOrDefaultAsync(x => x.ClassificationId == cat.ClassificationId);
                 if (classification != null)
                 {
                     currentCat.Classification = classification;
@@ -275,12 +285,23 @@ namespace CatsCenterAPI.Controllers
                 currentCat.IsKitty = cat.IsKitty;
                 currentCat.Approved = cat.Approved;
 
+                if (cat.CategoryIds != null && _context.CategoriesOfCats != null)
+                {
+                    for (int i = 0; i < cat.CategoryIds.Length; i++) 
+                    {
+                        if (_context.Categories.FirstOrDefault(e => e.CategoryId == cat.CategoryIds[i]) != null)
+                        {
+                            _context.CategoriesOfCats.Add(new CategoriesOfCat() { CategoryId = cat.CategoryIds[i], CatId = id });
+                        }
+                    }
+                }
+
                 try
                 {
                     await _context.SaveChangesAsync();
 
                     // Changing filenamme and filepath
-                    string newFilePath = Configuration.imagesPath + "\\" + (currentCat.Classification == null ? "NoClassification" : currentCat.Classification.Name)
+                    string newFilePath = Configuration.imagesPath + "\\" + (classification == null ? "NoClassification" : classification.Name)
                         + "\\" + currentCat.CatId + (currentCat.IsKitty ? "1" : "0") + "." + currentCat.FileType[6..];
                     if (oldFilePath != newFilePath)
                     {
