@@ -17,10 +17,13 @@ public partial class Cat
     public bool IsKitty { get; set; }
 
     public bool? Approved { get; set; }
+    //public virtual User? AddedUser { get; set; }
+    //[JsonIgnore]
+    //public virtual ICollection<CategoriesOfCat>? CategoriesOfCats { get; set; } = new List<CategoriesOfCat>();
 
-    public virtual User? AddedUser { get; set; }
-    [JsonIgnore]
-    public virtual ICollection<CategoriesOfCat>? CategoriesOfCats { get; set; } = new List<CategoriesOfCat>();
+    public virtual User AddedUser { get; set; } = null!;
+
+    public virtual ICollection<CategoriesOfCat> CategoriesOfCats { get; set; } = new List<CategoriesOfCat>();
 
     public virtual Classification? Classification { get; set; }
 }

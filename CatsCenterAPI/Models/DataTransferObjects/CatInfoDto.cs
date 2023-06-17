@@ -1,9 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace CatsCenterAPI.Models.DataTransferObjects
 {
     public class CatInfoDto
     {
+        private CatsCenterDbContext _context = new CatsCenterDbContext();
         public CatInfoDto(Cat cat)
         {
             CatId = cat.CatId;
@@ -11,7 +13,8 @@ namespace CatsCenterAPI.Models.DataTransferObjects
             AddedUserName = cat.AddedUser == null ? "Admin" : cat.AddedUser.Name;
             IsKitty = cat.IsKitty;
             Classification = cat.Classification == null ? null : new ClassificationsSearchDto(cat.Classification);
-            Categories = new CatsCenterDbContext().Categories.AsEnumerable().Where(x => x.CategoriesOfCats.Any(c => c.CatId == cat.CatId) == true).ToList();
+            Categories = _context.Categories.AsEnumerable().Where(x => cat.CategoriesOfCats.Any(c => c.CategoryId == x.CategoryId) == true).ToList();
+            Debug.WriteLine(cat.CatId);
         }
 
         [JsonPropertyName("id")]

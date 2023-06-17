@@ -157,6 +157,7 @@ namespace CatsCenterAPI.Controllers
                 .Include(x => x.Classification).ThenInclude(x => x.LocationsOfClassifications).ThenInclude(x => x.Location)
                 .Include(x => x.Classification).ThenInclude(x => x.CoatTypesOfClassifications).ThenInclude(x => x.CoatType)
                 .Include(x => x.Classification).ThenInclude(x => x.CoatPatternsOfClassifications).ThenInclude(x => x.CoatPattern)
+                .Include(x => x.CategoriesOfCats).ThenInclude(x => x.Category)
             .ToList().ConvertAll(x => new CatInfoDto(x)).FirstOrDefault();
             if (cat == null) 
                 return NotFound();
