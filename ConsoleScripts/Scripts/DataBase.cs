@@ -67,7 +67,7 @@ namespace ConsoleScripts.Scripts
                     await GetImagesByFolder(directory, classificationId, isKitty);
                 }
             }
-            catch { }
+            catch (Exception ex) { Console.WriteLine(ex); }
         }
     }
 }
