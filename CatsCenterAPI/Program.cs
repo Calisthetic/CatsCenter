@@ -42,4 +42,6 @@ app.UseRouting();
 app.MapControllers();
 app.UseCors(MyAllowSpecificOrigins);
 
+app.UseResponseCompression();
+
 app.Run();
