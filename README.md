@@ -8,6 +8,12 @@ Connection string to localhost
 Scaffold-DbContext "Data Source=DESKTOP-GJJERNN;Initial Catalog=CatsCenterDB;Integrated Security=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
 ```
 
+### with password
+
+```bash
+Scaffold-DbContext "Data Source=192.168.0.117\SQLEXPRESS;Initial Catalog=db_name;User ID=User;Password=db_password;Trusted_Connection=true;TrustServerCertificate=true;Integrated Security=false;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
+```
+
 ###
 
 - [Cors](https://learn.microsoft.com/en-us/aspnet/web-api/overview/security/enabling-cross-origin-requests-in-web-api)
